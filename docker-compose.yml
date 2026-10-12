@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build: .
+    container_name: ugm_frontend
+    restart: unless-stopped
+    ports:
+      - "3010:80"
+    networks:
+      - ugm_net
+
+networks:
+  ugm_net:
+    name: ugm_net
+    external: true
