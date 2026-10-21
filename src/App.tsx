@@ -137,11 +137,7 @@ export const App: React.FC = () => {
           />
           <Route
             path="/market-intelligence"
-            element={
-              <ProtectedRoute>
-                <MarketIntelligence />
-              </ProtectedRoute>
-            }
+            element={<Navigate to="/appraisal" replace />}
           />
           <Route
             path="/reports"

@@ -12,7 +12,6 @@ import {
   Package,
   Settings,
   ShieldCheck,
-  TrendingUp,
   UserCheck,
   Users,
   X,
@@ -48,7 +47,6 @@ const navGroups: NavGroup[] = [
     items: [
       { name: 'Nasabah', path: '/customers', icon: Users },
       { name: 'Barang Gadai', path: '/assets', icon: Package },
-      { name: 'Appraisal', path: '/appraisal', icon: Calculator },
       { name: 'Transaksi Gadai', path: '/pawn-transactions', icon: FileText },
       { name: 'Pembayaran', path: '/payments', icon: CreditCard },
       { name: 'Inventory', path: '/inventory', icon: Boxes },
@@ -58,7 +56,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Intelijen & Laporan',
     items: [
-      { name: 'Harga Pasar', path: '/market-intelligence', icon: TrendingUp },
+      { name: 'Appraisal', path: '/appraisal', icon: Calculator },
       { name: 'Laporan', path: '/reports', icon: BarChart3 },
     ],
   },
