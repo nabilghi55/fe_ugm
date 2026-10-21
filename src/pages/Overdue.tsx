@@ -60,8 +60,7 @@ Kami menginformasikan bahwa pinjaman gadai Anda *${item.pawn_number}* untuk agun
 📌 *RINCIAN BIAYA PERPANJANGAN (10 HARI):*
 • Pokok Pinjaman: ${formatIDR(item.principal)}
 • Biaya Admin Perpanjangan (10%): *${formatIDR(item.admin_extension_fee)}*
-• Bunga / Titip (10% / 10 Hari): *${formatIDR(item.interest_fee)}*
-• *Total Wajib Bayar Perpanjangan:* *${formatIDR(totalBayar)}*
+• *Total Wajib Bayar Perpanjangan:* *${formatIDR(item.admin_extension_fee)}*
 
 Mohon segera melakukan perpanjangan atau pelunasan ke kantor cabang UGM. Terima kasih.
 _Unit Gadai Mandiri - Aman & Terpercaya_`;
@@ -99,7 +98,7 @@ _Unit Gadai Mandiri - Aman & Terpercaya_`;
             Aturan Jatuh Tempo: Pembayaran Lewat 10 Hari Wajib Perpanjang & Dikenakan Admin 10%
           </h4>
           <p className="text-rose-800 leading-relaxed text-xs">
-            Nasabah yang telah lewat 10 hari <strong>DIBLOK MERAH</strong> di sistem. Kasir wajib menagihkan <strong>Biaya Admin Perpanjangan 10%</strong> dari pokok pinjaman ditambah bunga 10% untuk memperpanjang siklus akad selama 10 hari ke depan.
+            Nasabah yang telah lewat 10 hari <strong>DIBLOK MERAH</strong> di sistem. Kasir wajib menagihkan <strong>Biaya Admin Perpanjangan 10%</strong> dari pokok pinjaman untuk memperpanjang siklus akad selama 10 hari ke depan.
           </p>
         </div>
       </div>
@@ -188,14 +187,10 @@ _Unit Gadai Mandiri - Aman & Terpercaya_`;
               <span>Biaya Admin Perpanjangan (10%):</span>
               <strong className="font-mono">{formatIDR(selectedItem?.admin_extension_fee || 0)}</strong>
             </div>
-            <div className="flex justify-between text-emerald-800 font-bold">
-              <span>Bunga / Titip (10% / 10 Hari):</span>
-              <strong className="font-mono">{formatIDR(selectedItem?.interest_fee || 0)}</strong>
-            </div>
             <div className="flex justify-between border-t border-slate-200 pt-1 text-sm font-black text-slate-900">
               <span>Total Dibayar Nasabah:</span>
               <span className="font-mono text-emerald-700">
-                {formatIDR((selectedItem?.admin_extension_fee || 0) + (selectedItem?.interest_fee || 0))}
+                {formatIDR(selectedItem?.admin_extension_fee || 0)}
               </span>
             </div>
           </div>

@@ -73,11 +73,10 @@ ${licensePlate ? `• *NOMOR PLAT KENDARAAN:* *${licensePlate}*\n` : ''}• No. 
 💰 *RINCIAN POKOK & BIAYA:*
 • Pokok Pinjaman: *${formatIDR(principal)}*
 • Biaya Administrasi (10%): ${formatIDR(adminFee)}
-• Bunga / Jasa Titip (10% / 10 Hari): ${formatIDR(interestAmount)} (Bisa disesuaikan)
 • *Pencairan Bersih Diterima:* *${formatIDR(netDisbursement)}*
 
 ⚠️ *KETENTUAN PENEBUSAN & PERPANJANGAN:*
-1. Pembayaran lewat 10 hari wajib diperpanjang dengan biaya admin 10% dari pinjaman pokok.
+1. Pembayaran lewat 10 hari wajib diperpanjang dengan biaya administrasi 10% dari pinjaman pokok.
 2. Pengambilan agunan wajib menunjukkan KTP asli dan bukti fisik nota ini.
 3. Hubungi CS Cabang: ${branchPhone}
 
@@ -344,10 +343,6 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
                   <span>Biaya Admin (10%):</span>
                   <span className="font-mono">{formatIDR(adminFee)}</span>
                 </div>
-                <div className="flex justify-between text-slate-700">
-                  <span>Bunga / Titip (10%):</span>
-                  <span className="font-mono">{formatIDR(interestAmount)} / 10 Hari</span>
-                </div>
                 <div className="border-t border-dashed border-black pt-1 flex justify-between font-black text-xs">
                   <span>DITERIMA BERSIH:</span>
                   <span className="text-sm font-black text-emerald-800">{formatIDR(netDisbursement)}</span>
@@ -471,8 +466,8 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
                 <span className="text-xs font-bold font-mono text-slate-800">{formatIDR(adminFee)}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Bunga (10% / 10 Hari)</span>
-                <span className="text-xs font-bold font-mono text-emerald-800">{formatIDR(interestAmount)}</span>
+                <span className="text-emerald-700 block text-[10px] uppercase font-bold">Diterima Bersih</span>
+                <span className="text-xs font-black font-mono text-emerald-900">{formatIDR(netDisbursement)}</span>
               </div>
               <div>
                 <span className="text-rose-600 block text-[10px] uppercase font-bold">Jatuh Tempo (10 Hari)</span>
@@ -566,12 +561,12 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
                 <span className="font-extrabold text-slate-900 font-mono">{formatIDR(principal)}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">Admin 10%:</span>
+                <span className="text-slate-500 block text-[10px]">Biaya Admin (10%):</span>
                 <span className="font-bold text-slate-800 font-mono">{formatIDR(adminFee)}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">Bunga 10% (10 Hari):</span>
-                <span className="font-bold text-emerald-800 font-mono">{formatIDR(interestAmount)}</span>
+                <span className="text-slate-500 block text-[10px]">Diterima Bersih:</span>
+                <span className="font-extrabold text-emerald-800 font-mono">{formatIDR(netDisbursement)}</span>
               </div>
             </div>
 

@@ -59,7 +59,6 @@ Kondisi: Mulus 95%, Mesin Halus, Pajak Hidup
 Nilai Taksiran Barang: Rp 22.500.000
 Pencairan / Pokok Pinjaman: Rp 15.000.000
 Biaya Admin 10%: Rp 1.500.000
-Bunga 10% per 10 hari: Rp 1.500.000
 Jatuh Tempo: 10 Hari (29/10/2026)`,
     },
     {
@@ -77,8 +76,7 @@ IMEI / SN: 356891102948123
 Kondisi: Ex Resmi iBox, BH 89%, Fullset Box & Kabel
 Taksiran Pasar: Rp 13.000.000
 Nominal Pinjaman: Rp 9.000.000
-Admin Fee (10%): Rp 900.000
-Bunga Titip 10% (10 Hari): Rp 900.000`,
+Biaya Admin (10%): Rp 900.000`,
     },
     {
       title: 'Motor Honda Beat CBS (Plat BA 2390 LK)',
@@ -94,9 +92,8 @@ Model: Beat CBS ISS 2022
 Plat Nomor Polisi: BA 2390 LK
 Kelengkapan: STNK Asli, BPKB Ada
 Taksiran: Rp 14.500.000
-Pencairan Bersih: Rp 10.000.000
-Admin: Rp 1.000.000 (10%)
-Bunga 10hr: Rp 1.000.000`,
+Pencairan Pokok: Rp 10.000.000
+Biaya Admin (10%): Rp 1.000.000`,
     },
   ];
 
@@ -187,9 +184,8 @@ Bunga 10hr: Rp 1.000.000`,
 
     // Rule: Admin fee 10% dari pencairan
     const adminFee = Math.round(principalAmount * 0.10);
-    // Rule: Bunga 10% per 10 hari (dapat diedit nominal/persen)
-    const interestRate = 10.0;
-    const interestAmount = Math.round(principalAmount * 0.10);
+    const interestRate = 0;
+    const interestAmount = 0;
 
     // Serial number / IMEI
     const snMatch = text.match(/(?:IMEI|SN|Nomor Seri|No Rangka)\s*[:=-]?\s*([A-Z0-9-]{8,25})/i);
@@ -247,8 +243,7 @@ Nomor Plat: BA 5621 WA
 Kondisi: Lengkap STNK BPKB, Mesin Standar
 Nilai Taksiran: Rp 18.000.000
 Pokok Pinjaman: Rp 12.000.000
-Biaya Admin 10%: Rp 1.200.000
-Bunga 10 Hari (10%): Rp 1.200.000`;
+Biaya Admin 10%: Rp 1.200.000`;
 
       handleProcessScan(mockText, url);
     };
@@ -278,7 +273,7 @@ Bunga 10 Hari (10%): Rp 1.200.000`;
               Notice Rian: Isi Data di Kertas Manual, Tinggal Difoto Langsung Masuk ke Sistem
             </h4>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Ambil foto formulir/nota kertas manual dari kamera HP atau upload foto. Sistem cerdas OCR akan membaca data nasabah, barang agunan, <strong>nomor plat kendaraan</strong>, serta menghitung <strong>admin 10% & bunga 10% (10 hari)</strong> secara otomatis!
+              Ambil foto formulir/nota kertas manual dari kamera HP atau upload foto. Sistem cerdas OCR akan membaca data nasabah, barang agunan, <strong>nomor plat kendaraan</strong>, serta menghitung <strong>biaya admin 10% (siklus 10 hari)</strong> secara otomatis!
             </p>
           </div>
         </div>
@@ -479,8 +474,8 @@ Bunga 10 Hari (10%): Rp 1.200.000`;
                     <strong className="font-mono text-slate-800">{formatIDR(extractedData.adminFee)}</strong>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Bunga (10% / 10 Hari):</span>
-                    <strong className="font-mono text-emerald-700">{formatIDR(extractedData.interestAmount)}</strong>
+                    <span>Cair Bersih:</span>
+                    <strong className="font-mono text-emerald-800 font-bold">{formatIDR(extractedData.principalAmount - extractedData.adminFee)}</strong>
                   </div>
                 </div>
               </div>

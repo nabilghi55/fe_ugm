@@ -281,19 +281,18 @@ export const PawnTransactions: React.FC = () => {
     }
   };
 
-  // Proses Perpanjangan 10 Hari (Dikenakan Biaya Admin 10% + Bunga 10%)
+  // Proses Perpanjangan 10 Hari (Dikenakan Biaya Admin 10%)
   const handleProcessExtension = async () => {
     if (!extendingPawn) return;
     const principal = extendingPawn.principal_amount;
     const extAdmin = Math.round(principal * 0.10); // Biaya admin 10% dari pencairan
-    const extInterest = extendingPawn.interest_amount || Math.round(principal * 0.10); // Bunga 10%
-    const totalExtPay = extAdmin + extInterest;
+    const totalExtPay = extAdmin;
 
     try {
       await pawnApi.processPayment(extendingPawn.id, 'EXTENSION_PAYMENT', totalExtPay, 'CASH');
       setIsExtensionModalOpen(false);
       showSuccess(
-        `Perpanjangan 10 hari berhasil diproses! Admin 10% (${formatIDR(extAdmin)}) & Bunga (${formatIDR(extInterest)}) terbayar lunas.`,
+        `Perpanjangan 10 hari berhasil diproses! Biaya Admin 10% (${formatIDR(extAdmin)}) terbayar lunas.`,
         'Perpanjangan Sukses'
       );
       fetchPawns();
@@ -328,7 +327,6 @@ export const PawnTransactions: React.FC = () => {
       newDueDate: string;
       principal: number;
       adminFee: number;
-      interestFee: number;
       totalPaid: number;
       createdAt: string;
     }> = [];
@@ -337,7 +335,6 @@ export const PawnTransactions: React.FC = () => {
       if (p.extensions && p.extensions.length > 0) {
         p.extensions.forEach((ext, idx) => {
           const adminF = ext.admin_fee_paid || Math.round(p.principal_amount * 0.10);
-          const intF = ext.interest_paid || Math.round(p.principal_amount * 0.10);
           list.push({
             pawn: p,
             extensionNumber: ext.extension_number || idx + 1,
@@ -345,15 +342,13 @@ export const PawnTransactions: React.FC = () => {
             newDueDate: ext.new_due_date,
             principal: p.principal_amount,
             adminFee: adminF,
-            interestFee: intF,
-            totalPaid: adminF + intF,
+            totalPaid: adminF,
             createdAt: ext.created_at,
           });
         });
       } else if (p.status === 'EXTENDED' || isOverdue(p)) {
         // Mock / active perpanjangan pending
         const adminF = Math.round(p.principal_amount * 0.10);
-        const intF = Math.round(p.principal_amount * 0.10);
         list.push({
           pawn: p,
           extensionNumber: 1,
@@ -361,8 +356,7 @@ export const PawnTransactions: React.FC = () => {
           newDueDate: p.due_date,
           principal: p.principal_amount,
           adminFee: adminF,
-          interestFee: intF,
-          totalPaid: adminF + intF,
+          totalPaid: adminF,
           createdAt: p.loan_date,
         });
       }
@@ -376,10 +370,9 @@ export const PawnTransactions: React.FC = () => {
     const totalCount = allExtensions.length;
     const totalPrincipal = allExtensions.reduce((acc, curr) => acc + curr.principal, 0);
     const totalAdminFee = allExtensions.reduce((acc, curr) => acc + curr.adminFee, 0);
-    const totalInterestFee = allExtensions.reduce((acc, curr) => acc + curr.interestFee, 0);
-    const grandTotal = allExtensions.reduce((acc, curr) => acc + curr.totalPaid, 0);
+    const grandTotal = totalAdminFee;
 
-    return { totalCount, totalPrincipal, totalAdminFee, totalInterestFee, grandTotal };
+    return { totalCount, totalPrincipal, totalAdminFee, grandTotal };
   }, [allExtensions]);
 
   const formatIDR = (val: number) => {
@@ -422,7 +415,7 @@ export const PawnTransactions: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Siklus 10 hari · Biaya admin 10% · Bunga 10% editable · Taksiran instan · Bukti fisik 2 lembar
+            Siklus 10 hari · Biaya admin 10% · Taksiran instan · Bukti fisik 2 lembar
           </p>
         </div>
 
@@ -531,7 +524,7 @@ export const PawnTransactions: React.FC = () => {
                   <th className="px-5 py-3.5">Nasabah</th>
                   <th className="px-5 py-3.5">Barang Agunan & No Plat</th>
                   <th className="px-5 py-3.5">Pokok Pinjaman</th>
-                  <th className="px-5 py-3.5">Admin (10%) & Bunga (10%)</th>
+                  <th className="px-5 py-3.5">Biaya Admin (10%)</th>
                   <th className="px-5 py-3.5">Jatuh Tempo (10 Hari)</th>
                   <th className="px-5 py-3.5">Status</th>
                   <th className="px-5 py-3.5 text-right">Aksi Operasional</th>
@@ -542,7 +535,6 @@ export const PawnTransactions: React.FC = () => {
                   const overdue = isOverdue(p);
                   const plate = p.appraisal?.asset?.license_plate;
                   const adminF = p.administration_fee || Math.round(p.principal_amount * 0.10);
-                  const interestF = p.interest_amount || Math.round(p.principal_amount * (p.interest_rate / 100));
 
                   return (
                     <tr
@@ -591,14 +583,14 @@ export const PawnTransactions: React.FC = () => {
                         {formatIDR(p.principal_amount)}
                       </td>
 
-                      {/* Admin 10% & Bunga 10% */}
+                      {/* Biaya Admin 10% & Cair Bersih */}
                       <td className="px-5 py-3.5">
                         <div className="space-y-0.5">
                           <span className="text-[11px] text-slate-700 block">
                             Admin (10%): <strong className="font-mono">{formatIDR(adminF)}</strong>
                           </span>
-                          <span className="text-[11px] text-emerald-800 block">
-                            Bunga ({p.interest_rate}%): <strong className="font-mono">{formatIDR(interestF)}</strong>
+                          <span className="text-[11px] text-emerald-800 font-bold block">
+                            Cair Bersih: <strong className="font-mono">{formatIDR(p.principal_amount - adminF)}</strong>
                           </span>
                         </div>
                       </td>
@@ -620,7 +612,7 @@ export const PawnTransactions: React.FC = () => {
                         {(overdue || p.status === 'ACTIVE') && (
                           <button
                             type="button"
-                            title="Perpanjang Gadai (Admin 10% + Bunga 10%)"
+                            title="Perpanjang Gadai (Biaya Admin 10%)"
                             onClick={() => {
                               setExtendingPawn(p);
                               setIsExtensionModalOpen(true);
@@ -728,7 +720,7 @@ export const PawnTransactions: React.FC = () => {
                 </button>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
-                Setiap perpanjangan 10 hari dikenakan biaya admin 10% + bunga 10%.
+                Setiap perpanjangan 10 hari dikenakan biaya administrasi 10% dari pokok.
               </p>
 
               {/* Slider Pengatur Lebar Kolom (Bisa Ditarik) */}
@@ -771,9 +763,8 @@ export const PawnTransactions: React.FC = () => {
                       </span>
                     )}
 
-                    <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-500 pt-0.5">
-                      <span>Admin (10%): {formatIDR(ext.adminFee)}</span>
-                      <span>Bunga: {formatIDR(ext.interestFee)}</span>
+                    <div className="text-[10px] text-slate-500 pt-0.5">
+                      <span>Biaya Admin (10%): <strong className="font-mono text-slate-800">{formatIDR(ext.adminFee)}</strong></span>
                     </div>
                   </div>
                 ))
@@ -787,14 +778,10 @@ export const PawnTransactions: React.FC = () => {
                 <span className="font-bold text-emerald-400 font-mono">{extensionSummary.totalCount} Transaksi</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
+              <div className="text-[11px] text-slate-300">
                 <div>
-                  <span className="block text-[10px] text-slate-400">Total Admin (10%):</span>
-                  <span className="font-mono font-bold">{formatIDR(extensionSummary.totalAdminFee)}</span>
-                </div>
-                <div>
-                  <span className="block text-[10px] text-slate-400">Total Bunga (10%):</span>
-                  <span className="font-mono font-bold text-emerald-300">{formatIDR(extensionSummary.totalInterestFee)}</span>
+                  <span className="block text-[10px] text-slate-400">Total Biaya Admin (10%):</span>
+                  <span className="font-mono font-bold text-emerald-300 text-sm">{formatIDR(extensionSummary.totalAdminFee)}</span>
                 </div>
               </div>
 
@@ -1025,7 +1012,7 @@ export const PawnTransactions: React.FC = () => {
             </div>
           )}
 
-          {/* Pokok Pinjaman, Admin 10%, dan Bunga 10% (Item 2, 3, 4) */}
+          {/* Pokok Pinjaman & Biaya Admin 10% */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Pokok Pinjaman */}
             <div className="space-y-1">
@@ -1091,36 +1078,18 @@ export const PawnTransactions: React.FC = () => {
             </div>
           </div>
 
-          {/* Bunga 10% per 10 Hari (Bisa Diedit Manual / Nominal Dikurangin) */}
-          <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-slate-800">
-              <span className="text-emerald-900 font-bold">Bunga / Jasa Titip (10% per 10 Hari - Bisa Diedit):</span>
-              <span className="text-[11px] font-mono font-bold text-emerald-800">{formatIDR(interestAmount)}</span>
+          {/* Ringkasan Pencairan Bersih */}
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+            <div>
+              <span className="text-[10px] text-slate-600 block uppercase font-bold">Total Pencairan Bersih:</span>
+              <span className="text-sm font-black text-emerald-800 font-mono">
+                {formatIDR(principalAmount - adminFee)}
+              </span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[10px] text-slate-600">Persen Bunga (% / 10 Hari)</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={interestPercent}
-                  onChange={(e) => handleInterestPercentChange(Number(e.target.value))}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-slate-600">Nominal Bunga (Rp - Bisa Dikurangi/Diskon)</label>
-                <input
-                  type="number"
-                  value={interestAmount}
-                  onChange={(e) => handleInterestAmountChange(Number(e.target.value))}
-                  className="w-full bg-white border border-emerald-300 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-emerald-900"
-                />
-              </div>
+            <div className="text-right text-[10px] text-slate-500">
+              <span className="block font-semibold">Pokok: {formatIDR(principalAmount)}</span>
+              <span className="block">Biaya Admin (10%): -{formatIDR(adminFee)}</span>
             </div>
-            <p className="text-[10px] text-slate-500">
-              * Nominal bunga dapat dikurangi secara manual sesuai kesepakatan/diskon untuk nasabah.
-            </p>
           </div>
 
           {/* Form Actions */}
@@ -1196,10 +1165,10 @@ export const PawnTransactions: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-200 space-y-2">
             <div className="flex items-center gap-1.5 font-bold text-orange-900 text-xs">
               <Clock className="w-4 h-4 text-orange-600" />
-              <span>Ketentuan Perpanjangan: Dikenakan Admin 10% + Bunga 10%</span>
+              <span>Ketentuan Perpanjangan: Dikenakan Biaya Admin 10%</span>
             </div>
             <p className="text-slate-700 leading-relaxed text-[11px]">
-              Sesuai aturan operasional UGM: Pembayaran lewat 10 hari masuk ke perpanjangan dan dikenakan biaya admin 10% dari pokok pencairan.
+              Sesuai aturan operasional UGM: Pembayaran lewat 10 hari masuk ke perpanjangan dan dikenakan biaya administrasi 10% dari pokok pencairan.
             </p>
           </div>
 
@@ -1218,21 +1187,12 @@ export const PawnTransactions: React.FC = () => {
             </div>
             <div className="flex justify-between border-t border-slate-200 pt-1 text-slate-700">
               <span>Biaya Admin Perpanjangan (10%):</span>
-              <strong className="font-mono">{formatIDR(Math.round((extendingPawn?.principal_amount || 0) * 0.10))}</strong>
-            </div>
-            <div className="flex justify-between text-emerald-800">
-              <span>Bunga / Titip (10% / 10 Hari):</span>
-              <strong className="font-mono">
-                {formatIDR(extendingPawn?.interest_amount || Math.round((extendingPawn?.principal_amount || 0) * 0.10))}
-              </strong>
+              <strong className="font-mono text-slate-900">{formatIDR(Math.round((extendingPawn?.principal_amount || 0) * 0.10))}</strong>
             </div>
             <div className="flex justify-between border-t-2 border-slate-300 pt-1.5 text-sm font-bold text-slate-900">
               <span>Total Bayar Perpanjangan:</span>
-              <span className="font-mono text-emerald-700">
-                {formatIDR(
-                  Math.round((extendingPawn?.principal_amount || 0) * 0.10) +
-                    (extendingPawn?.interest_amount || Math.round((extendingPawn?.principal_amount || 0) * 0.10))
-                )}
+              <span className="font-mono text-emerald-700 text-base font-black">
+                {formatIDR(Math.round((extendingPawn?.principal_amount || 0) * 0.10))}
               </span>
             </div>
           </div>
