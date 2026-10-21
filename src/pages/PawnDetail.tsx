@@ -9,6 +9,7 @@ import { UGMReceiptModal } from '../components/common/UGMReceiptModal';
 import { pawnApi } from '../services/endpoints';
 import { PawnTransaction, PaymentCalculation } from '../types';
 import { useAlert } from '../context/AlertContext';
+import { getAssetDisplayName } from '../utils/formatters';
 
 export const PawnDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -665,7 +666,7 @@ export const PawnDetail: React.FC = () => {
                 <div>
                   <span className="text-slate-500 text-[11px] block">Nama / Jenis Barang:</span>
                   <span className="font-bold text-slate-900">
-                    {pawn.appraisal?.asset?.brand} {pawn.appraisal?.asset?.model} {pawn.appraisal?.asset?.variant || ''}
+                    {getAssetDisplayName(pawn.appraisal?.asset?.brand, pawn.appraisal?.asset?.model, pawn.appraisal?.asset?.variant)}
                   </span>
                 </div>
                 <div>

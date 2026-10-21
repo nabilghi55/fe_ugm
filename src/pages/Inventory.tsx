@@ -7,6 +7,7 @@ import { QRCodeView } from '../components/common/QRCodeView';
 import { inventoryApi } from '../services/endpoints';
 import { Inventory as InventoryType } from '../types';
 import { useAlert } from '../context/AlertContext';
+import { getAssetDisplayName } from '../utils/formatters';
 
 const getWarehouseHub = (warehouse: string) => {
   const name = warehouse.toLowerCase();
@@ -201,7 +202,7 @@ export const Inventory: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 text-slate-600">
                 <Tag className="w-4 h-4 text-amber-600" />
-                <span>Barang: <strong className="text-slate-800">{item.asset?.brand} {item.asset?.model}</strong></span>
+                <span>Barang: <strong className="text-slate-800">{getAssetDisplayName(item.asset?.brand, item.asset?.model)}</strong></span>
               </div>
             </div>
 
@@ -235,7 +236,7 @@ export const Inventory: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <div className="space-y-0.5">
                     <p className="text-[10px] uppercase font-bold tracking-wider text-emerald-800">SISTEM GADAI KOTA PADANG</p>
-                    <p className="text-xs font-bold text-slate-900">{matchedItem?.asset?.brand} {matchedItem?.asset?.model}</p>
+                    <p className="text-xs font-bold text-slate-900">{getAssetDisplayName(matchedItem?.asset?.brand, matchedItem?.asset?.model)}</p>
                   </div>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700">
                     SEAL #SG-{selectedQR.slice(-4)}
@@ -323,7 +324,7 @@ export const Inventory: React.FC = () => {
               </div>
               <dl className="grid grid-cols-[110px_1fr] gap-x-3 gap-y-2 text-xs">
                 <dt className="text-slate-500">Barang</dt>
-                <dd className="font-semibold text-slate-900">{scanResult.asset?.brand} {scanResult.asset?.model}</dd>
+                <dd className="font-semibold text-slate-900">{getAssetDisplayName(scanResult.asset?.brand, scanResult.asset?.model)}</dd>
                 <dt className="text-slate-500">Gudang</dt>
                 <dd className="font-semibold text-slate-900">{getWarehouseHub(scanResult.warehouse)}</dd>
                 <dt className="text-slate-500">Posisi</dt>

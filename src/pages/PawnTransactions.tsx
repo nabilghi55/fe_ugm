@@ -16,6 +16,7 @@ import { ManualFormScannerModal, ExtractedManualData } from '../components/commo
 import { PrinterSettingsModal } from '../components/common/PrinterSettingsModal';
 import { UGMReceiptModal } from '../components/common/UGMReceiptModal';
 import { lookupInstantEstimation, getFacebookMarketplaceUrl, CatalogItem } from '../utils/marketPriceCatalog';
+import { getAssetDisplayName } from '../utils/formatters';
 
 export const PawnTransactions: React.FC = () => {
   const [pawns, setPawns] = useState<PawnTransaction[]>([]);
@@ -211,14 +212,37 @@ export const PawnTransactions: React.FC = () => {
     }
     setSubmitting(true);
     try {
+      // Map category name ke UUID category yang valid di database
+      const categoryMap: Record<string, string> = {
+        'Smartphone': '00000000-0000-0000-0000-000000000003',
+        'HP': '00000000-0000-0000-0000-000000000003',
+        'Laptop': '00000000-0000-0000-0000-000000000004',
+        'Kamera': '00000000-0000-0000-0000-000000000005',
+        'Emas': '00000000-0000-0000-0000-000000000006',
+        'Kendaraan': '00000000-0000-0000-0000-000000000007',
+        'Motor': '00000000-0000-0000-0000-000000000007',
+        'Mobil': '00000000-0000-0000-0000-000000000007',
+      };
+      const resolvedCatId =
+        categoryMap[categoryName] ||
+        assets.find((a) => a.category?.name === categoryName)?.category_id ||
+        '00000000-0000-0000-0000-000000000003';
+
+      // Cegah pengulangan brand di model (misal brand: Asus, model: Asus Vivobook -> model: Vivobook)
+      let cleanedModel = modelInput.trim();
+      const bTrim = brandInput.trim();
+      if (bTrim && cleanedModel.toLowerCase().startsWith(bTrim.toLowerCase())) {
+        cleanedModel = cleanedModel.slice(bTrim.length).trim() || cleanedModel;
+      }
+
       // Buat asset jika kendaraan atau barang baru
       let finalAppraisalId = appraisalId || undefined;
       if (!finalAppraisalId) {
         try {
           const newAsset = await assetApi.create({
-            category_id: assets[0]?.category_id || '00000000-0000-0000-0000-000000000001',
-            brand: brandInput,
-            model: modelInput,
+            category_id: resolvedCatId,
+            brand: bTrim,
+            model: cleanedModel,
             license_plate: licensePlateInput.toUpperCase(),
             serial_number: `SN-${Date.now().toString().slice(-8)}`,
             physical_condition: 'BAIK',
@@ -243,7 +267,7 @@ export const PawnTransactions: React.FC = () => {
 
       setIsModalOpen(false);
       showSuccess(
-        `Pengajuan gadai ${brandInput} ${modelInput} sebesar ${formatIDR(principalAmount)} (Admin 10%: ${formatIDR(adminFee)}) berhasil dibuat!`,
+        `Pengajuan gadai ${getAssetDisplayName(bTrim, cleanedModel)} sebesar ${formatIDR(principalAmount)} (Admin 10%: ${formatIDR(adminFee)}) berhasil dibuat!`,
         'Transaksi Berhasil'
       );
       fetchPawns();
@@ -566,7 +590,7 @@ export const PawnTransactions: React.FC = () => {
                       {/* Barang Agunan & NOMOR PLAT KENDARAAN */}
                       <td className="px-5 py-3.5">
                         <span className="text-slate-900 font-bold block">
-                          {p.appraisal?.asset?.brand} {p.appraisal?.asset?.model}
+                          {getAssetDisplayName(p.appraisal?.asset?.brand, p.appraisal?.asset?.model)}
                         </span>
                         {plate ? (
                           <div className="mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 text-white font-mono font-black text-[11px] border border-slate-700 tracking-wider shadow-2xs">

@@ -3,6 +3,7 @@ import { Printer, MessageCircle, Share2, Check, Copy, ArrowRight, ShieldCheck, S
 import { Modal } from '../ui/Modal';
 import { QRCodeView } from './QRCodeView';
 import { PawnTransaction } from '../../types';
+import { getAssetDisplayName } from '../../utils/formatters';
 
 interface UGMReceiptModalProps {
   isOpen: boolean;
@@ -32,9 +33,10 @@ export const UGMReceiptModal: React.FC<UGMReceiptModalProps> = ({
   const customerNik = pawn.customer?.nik || '-';
   const customerAddress = pawn.customer?.address || 'Kota Padang';
 
-  const assetBrand = pawn.appraisal?.asset?.brand || 'Barang';
-  const assetModel = pawn.appraisal?.asset?.model || 'Agunan';
+  const assetBrand = pawn.appraisal?.asset?.brand || '';
+  const assetModel = pawn.appraisal?.asset?.model || '';
   const assetVariant = pawn.appraisal?.asset?.variant || '';
+  const fullAssetName = getAssetDisplayName(assetBrand, assetModel, assetVariant);
   const licensePlate = pawn.appraisal?.asset?.license_plate || '';
   const serialNumber = pawn.appraisal?.asset?.serial_number || pawn.appraisal?.asset?.imei || '-';
   const physicalCondition = pawn.appraisal?.asset?.physical_condition || 'BAIK / NORMAL';
@@ -42,7 +44,6 @@ export const UGMReceiptModal: React.FC<UGMReceiptModalProps> = ({
   const principal = pawn.principal_amount || 0;
   // Admin fee default 10%
   const adminFee = pawn.administration_fee || Math.round(principal * 0.10);
-  // Bunga 10% per 10 hari (dapat disesuaikan)
   const interestRate = pawn.interest_rate || 10.0;
   const interestAmount = pawn.interest_amount || Math.round(principal * (interestRate / 100.0));
   const netDisbursement = principal - adminFee;
@@ -66,7 +67,7 @@ Terima kasih telah bertransaksi di *Unit Gadai Mandiri (UGM)*. Berikut kami samp
 • Unit Cabang: ${branchName}
 
 📦 *DATA BARANG AGUNAN:*
-• Barang: *${assetBrand} ${assetModel} ${assetVariant}*
+• Barang: *${fullAssetName}*
 ${licensePlate ? `• *NOMOR PLAT KENDARAAN:* *${licensePlate}*\n` : ''}• No. Seri / IMEI: ${serialNumber}
 • Kondisi: ${physicalCondition}
 
@@ -315,7 +316,7 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
               {/* Agunan */}
               <div className="space-y-0.5 border-b border-dashed border-black pb-2 text-[10px]">
                 <p className="font-bold underline uppercase">Barang Agunan (Marhun):</p>
-                <div className="font-bold text-[11px] text-slate-900">{assetBrand} {assetModel} {assetVariant}</div>
+                <div className="font-bold text-[11px] text-slate-900">{fullAssetName}</div>
                 {licensePlate && (
                   <div className="flex justify-between font-black text-xs text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-300">
                     <span>NOMOR PLAT:</span>
@@ -436,7 +437,7 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
                 </p>
                 <div className="grid grid-cols-3 gap-1">
                   <span className="text-slate-500 text-[11px]">Barang:</span>
-                  <span className="col-span-2 font-bold text-slate-900">{assetBrand} {assetModel} {assetVariant}</span>
+                  <span className="col-span-2 font-bold text-slate-900">{fullAssetName}</span>
 
                   {licensePlate && (
                     <>
@@ -544,7 +545,7 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-[10px] font-bold text-slate-500 block uppercase">Barang Jaminan:</span>
-                <p className="font-bold text-slate-900">{assetBrand} {assetModel} {assetVariant}</p>
+                <p className="font-bold text-slate-900">{fullAssetName}</p>
                 {licensePlate && (
                   <p className="text-xs font-bold text-rose-700 font-mono">
                     NOMOR PLAT: <span className="bg-rose-100 px-1.5 py-0.5 rounded">{licensePlate}</span>
