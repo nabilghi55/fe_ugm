@@ -179,7 +179,11 @@
   #printable-pink-paper,
   #printable-pink-paper *,
   #printable-sticker,
-  #printable-sticker * {
+  #printable-sticker *,
+  #printable-ugm-receipt,
+  #printable-ugm-receipt *,
+  #printable-thermal-receipt,
+  #printable-thermal-receipt * {
     visibility: visible;
   }
   #printable-pink-paper {
@@ -205,6 +209,33 @@
     background: #ffffff !important;
     border: 2px dashed #0f172a !important;
     border-radius: 8px;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #printable-ugm-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #printable-thermal-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 0 auto;
+    padding: 2mm 3mm;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Courier New', Courier, monospace, ui-monospace !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

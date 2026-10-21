@@ -16,6 +16,7 @@ export const UGMReceiptModal: React.FC<UGMReceiptModalProps> = ({
   pawn,
 }) => {
   const [copiedWA, setCopiedWA] = useState(false);
+  const [printFormat, setPrintFormat] = useState<'THERMAL_80MM' | 'TWO_PLY'>('THERMAL_80MM');
 
   if (!pawn) return null;
 
@@ -107,11 +108,11 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="📄 Nota Bukti Gadai UGM (Cetak Fisik 2 Lembar & WA)" maxWidth="4xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="📄 Nota Bukti Gadai UGM (Struk Thermal 80mm & Bukti 2 Lembar)" maxWidth="4xl">
       <div className="space-y-4 font-sans text-xs text-slate-800">
-        {/* Top Control Bar: WA & Print Button */}
+        {/* Top Control Bar: WA, Format Switcher & Print Button */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="font-bold text-slate-900 text-xs">Aksi Cepat:</span>
             <button
               type="button"
@@ -119,7 +120,7 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
               className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
             >
               <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
-              <span>Kirim Nota ke WA Nasabah</span>
+              <span>Kirim Nota WA</span>
             </button>
             <button
               type="button"
@@ -127,24 +128,182 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
               className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-semibold text-xs flex items-center gap-1 cursor-pointer transition-colors"
             >
               {copiedWA ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-              <span>{copiedWA ? 'Tersalin!' : 'Salin Pesan WA'}</span>
+              <span>{copiedWA ? 'Tersalin!' : 'Salin Pesan'}</span>
             </button>
           </div>
 
+          {/* Format Selector Pills & Print Button */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-500">2 Lembar: Arsip UGM + Bukti Nasabah</span>
+            <div className="flex rounded-xl bg-slate-200 p-0.5 border border-slate-300">
+              <button
+                type="button"
+                onClick={() => setPrintFormat('THERMAL_80MM')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  printFormat === 'THERMAL_80MM'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'text-slate-700 hover:text-slate-900'
+                }`}
+              >
+                🧾 Thermal 80mm (POS-80)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintFormat('TWO_PLY')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  printFormat === 'TWO_PLY'
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-700 hover:text-slate-900'
+                }`}
+              >
+                📑 2 Lembar Kantor (A4)
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
+              className="px-4 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all hover:scale-105"
             >
-              <Printer className="w-4 h-4 text-emerald-400" />
-              <span>Cetak Bukti Fisik Sekarang</span>
+              <Printer className="w-4 h-4 text-emerald-200" />
+              <span>Cetak ke {printFormat === 'THERMAL_80MM' ? 'POS-80' : 'Printer'}</span>
             </button>
           </div>
         </div>
 
-        {/* Printable Area: Dua Rangkap (Lembar UGM & Lembar Nasabah) */}
+        {/* ================= MODE 1: FORMAT THERMAL 80MM (POS-80 PRINTER) ================= */}
+        {printFormat === 'THERMAL_80MM' && (
+          <div className="flex justify-center p-4 bg-slate-100 rounded-2xl overflow-x-auto">
+            <div
+              id="printable-thermal-receipt"
+              className="w-full max-w-[340px] bg-white p-5 shadow-lg border-2 border-slate-300 font-mono text-[11px] text-black leading-snug space-y-2.5 rounded-xl"
+            >
+              {/* Kop UGM */}
+              <div className="text-center space-y-0.5 border-b border-dashed border-black pb-2">
+                <h3 className="text-sm font-black tracking-wider uppercase">UNIT GADAI MANDIRI</h3>
+                <p className="text-[10px] font-bold text-emerald-800">SYARIAH PADANG (BEBAS RIBA)</p>
+                <p className="text-[9px] text-slate-700">{branchName}</p>
+                <p className="text-[9px] text-slate-700">{branchAddress}</p>
+                <p className="text-[9px] text-slate-700">Telp/WA: {branchPhone}</p>
+              </div>
+
+              {/* Transaksi & Waktu */}
+              <div className="space-y-0.5 border-b border-dashed border-black pb-2 text-[10px]">
+                <div className="flex justify-between font-bold">
+                  <span>NO. SBG:</span>
+                  <span className="font-mono">{sbgNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>No. Trans:</span>
+                  <span>{pawn.pawn_number}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tgl Akad:</span>
+                  <span>{loanDateStr}</span>
+                </div>
+                <div className="flex justify-between font-black text-rose-700">
+                  <span>JATUH TEMPO:</span>
+                  <span>{dueDateStr} (10 HARI)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Kasir:</span>
+                  <span>Kasir Cabang Padang</span>
+                </div>
+              </div>
+
+              {/* Data Nasabah */}
+              <div className="space-y-0.5 border-b border-dashed border-black pb-2 text-[10px]">
+                <p className="font-bold underline uppercase">Data Nasabah (Rahin):</p>
+                <div className="flex justify-between">
+                  <span>Nama:</span>
+                  <span className="font-bold">{customerName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>NIK:</span>
+                  <span>{customerNik}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>No. HP:</span>
+                  <span>{customerPhone}</span>
+                </div>
+              </div>
+
+              {/* Agunan */}
+              <div className="space-y-0.5 border-b border-dashed border-black pb-2 text-[10px]">
+                <p className="font-bold underline uppercase">Barang Agunan (Marhun):</p>
+                <div className="font-bold text-[11px] text-slate-900">{assetBrand} {assetModel} {assetVariant}</div>
+                {licensePlate && (
+                  <div className="flex justify-between font-black text-xs text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-300">
+                    <span>NOMOR PLAT:</span>
+                    <span>{licensePlate}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-[9px]">
+                  <span>No Seri/IMEI:</span>
+                  <span>{serialNumber}</span>
+                </div>
+                <div className="flex justify-between text-[9px]">
+                  <span>Kondisi:</span>
+                  <span>{physicalCondition}</span>
+                </div>
+              </div>
+
+              {/* Rincian Finansial */}
+              <div className="space-y-1 border-b-2 border-black pb-2 text-[10px]">
+                <p className="font-bold underline uppercase">Rincian Dana & Biaya:</p>
+                <div className="flex justify-between">
+                  <span>Pokok Pinjaman:</span>
+                  <span className="font-bold font-mono">{formatIDR(principal)}</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>Biaya Admin (10%):</span>
+                  <span className="font-mono">{formatIDR(adminFee)}</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>Bunga / Titip (10%):</span>
+                  <span className="font-mono">{formatIDR(interestAmount)} / 10 Hari</span>
+                </div>
+                <div className="border-t border-dashed border-black pt-1 flex justify-between font-black text-xs">
+                  <span>DITERIMA BERSIH:</span>
+                  <span className="text-sm font-black text-emerald-800">{formatIDR(netDisbursement)}</span>
+                </div>
+              </div>
+
+              {/* Ketentuan 10 Hari */}
+              <div className="text-[8.5px] leading-tight text-slate-800 space-y-0.5 border-b border-dashed border-black pb-2">
+                <p className="font-bold">KETENTUAN SIKLUS & PENGAMBILAN:</p>
+                <p>1. Masa gadai berlaku 10 HARI sejak tanggal akad.</p>
+                <p>2. Perpanjangan lewat 10 hari wajib membayar biaya admin 10% dari pinjaman pokok.</p>
+                <p>3. Penebusan agunan wajib membawa struk asli ini & KTP asli nasabah.</p>
+              </div>
+
+              {/* QR Code */}
+              <div className="flex flex-col items-center justify-center py-1">
+                <QRCodeView value={sbgNumber} size={75} label={sbgNumber} />
+                <p className="text-[8px] text-slate-500 mt-0.5">Scan Verifikasi Keaslian SBG</p>
+              </div>
+
+              {/* Tanda Tangan Kasir & Nasabah */}
+              <div className="pt-2 grid grid-cols-2 text-center text-[9px] gap-2">
+                <div>
+                  <p className="text-slate-600 mb-6">Nasabah (Rahin)</p>
+                  <p className="font-bold border-t border-black pt-0.5">{customerName}</p>
+                </div>
+                <div>
+                  <p className="text-slate-600 mb-6">Kasir Cabang UGM</p>
+                  <p className="font-bold border-t border-black pt-0.5">Kasir Padang</p>
+                </div>
+              </div>
+
+              <div className="text-center pt-2 text-[8px] text-slate-500 border-t border-dashed border-black">
+                <p>*** SIMPAN NOTA INI DENGAN BAIK ***</p>
+                <p>Unit Gadai Mandiri Syariah · Berkah Amanah</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= MODE 2: PRINTABLE AREA DUA RANGKAP (LEMBAR UGM & NASABAH) ================= */}
+        {printFormat === 'TWO_PLY' && (
         <div id="printable-ugm-receipt" className="space-y-6 print:m-0 print:p-0">
           {/* ================= LEMBAR 1: BUKTI FISIK UGM (ARSIP KANTOR) ================= */}
           <div className="p-5 rounded-2xl bg-white border-2 border-slate-300 shadow-sm space-y-3.5 print:border-black print:p-2 print:shadow-none">
@@ -363,6 +522,7 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
             </div>
           </div>
         </div>
+        )}
 
         {/* Modal Bottom Close */}
         <div className="flex justify-end pt-3 border-t border-slate-200">
