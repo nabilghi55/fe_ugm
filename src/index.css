@@ -166,15 +166,32 @@
 @media print {
   @page {
     size: auto;
-    margin: 8mm;
+    margin: 4mm;
   }
-  body {
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
     background: transparent !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   body * {
     visibility: hidden;
+  }
+  /* Unconstrain fixed modal containers so print preview doesn't clip to blank */
+  .fixed {
+    position: static !important;
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+  }
+  .overflow-hidden,
+  .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
   }
   #printable-pink-paper,
   #printable-pink-paper *,

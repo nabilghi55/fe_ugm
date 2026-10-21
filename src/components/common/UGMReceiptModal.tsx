@@ -104,7 +104,93 @@ _Unit Gadai Mandiri - Solusi Aman, Terpercaya, & Berkah._`;
   };
 
   const handlePrint = () => {
-    window.print();
+    const targetId = printFormat === 'THERMAL_80MM' ? 'printable-thermal-receipt' : 'printable-ugm-receipt';
+    const element = document.getElementById(targetId);
+    if (!element) {
+      window.print();
+      return;
+    }
+
+    // Create a clean, isolated hidden iframe to completely bypass modal overflow & backdrop
+    const iframe = document.createElement('iframe');
+    iframe.id = 'ugm-receipt-print-frame';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) {
+      window.print();
+      return;
+    }
+
+    // Collect all loaded CSS links and style elements
+    let stylesHtml = '';
+    document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
+      stylesHtml += node.outerHTML;
+    });
+
+    const isThermal = printFormat === 'THERMAL_80MM';
+
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Nota UGM - ${sbgNumber}</title>
+          ${stylesHtml}
+          <style>
+            @page {
+              size: ${isThermal ? '80mm auto' : 'auto'};
+              margin: ${isThermal ? '0mm' : '6mm'};
+            }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              box-sizing: border-box !important;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: ${isThermal ? '2mm 3mm' : '8px'} !important;
+              background: #ffffff !important;
+              color: #000000 !important;
+              width: ${isThermal ? '76mm' : '100%'} !important;
+              max-width: ${isThermal ? '76mm' : '100%'} !important;
+              overflow: visible !important;
+            }
+            #${targetId} {
+              width: 100% !important;
+              max-width: 100% !important;
+              margin: 0 auto !important;
+              box-shadow: none !important;
+              border-color: #000000 !important;
+              display: block !important;
+              visibility: visible !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="${targetId}">
+            ${element.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 2000);
+    }, 300);
   };
 
   return (
