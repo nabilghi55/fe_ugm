@@ -157,6 +157,11 @@ export const Appraisal: React.FC = () => {
                 <div className="text-xs space-y-1">
                   <p className="font-bold text-slate-800 text-sm">{selectedAsset.brand} {selectedAsset.model}</p>
                   <p className="text-slate-500">{selectedAsset.variant} • Tahun {selectedAsset.year || 2024}</p>
+                  {selectedAsset.license_plate && (
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 text-white font-mono font-bold text-xs tracking-wider">
+                      <span>{selectedAsset.license_plate}</span>
+                    </div>
+                  )}
                   <p className="text-slate-400 font-mono">IMEI/SN: {selectedAsset.imei || selectedAsset.serial_number || '-'}</p>
                 </div>
 

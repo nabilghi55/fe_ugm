@@ -102,6 +102,9 @@ export interface Asset {
   color?: string;
   specification?: string;
   accessories?: string;
+  license_plate?: string;
+  chassis_number?: string;
+  engine_number?: string;
   physical_condition: string;
   functional_condition: string;
   purchase_price: number;
@@ -187,6 +190,7 @@ export interface PawnTransaction {
   appraisal?: Appraisal;
   principal_amount: number;
   interest_rate: number;
+  interest_amount?: number;
   administration_fee: number;
   storage_fee: number;
   penalty_rate: number;
@@ -196,6 +200,20 @@ export interface PawnTransaction {
   status: PawnStatus;
   approved_at?: string;
   approval_notes?: string;
+  extensions?: PawnExtension[];
+  created_at: string;
+}
+
+export interface PawnExtension {
+  id: string;
+  pawn_transaction_id: string;
+  payment_id: string;
+  old_due_date: string;
+  new_due_date: string;
+  days_extended: number;
+  admin_fee_paid: number;
+  interest_paid: number;
+  extension_number: number;
   created_at: string;
 }
 

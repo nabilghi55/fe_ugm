@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Save, ShieldCheck } from 'lucide-react';
 import { Card } from '../components/ui/Card';
+import { PrinterSettingsModal } from '../components/common/PrinterSettingsModal';
 
 export const Settings: React.FC = () => {
+  const [isPrinterModalOpen, setIsPrinterModalOpen] = useState(false);
   return (
     <div className="space-y-6 animate-fade-in font-sans">
       <div>
@@ -83,14 +85,63 @@ export const Settings: React.FC = () => {
             </div>
           </div>
         </Card>
+
+        {/* Printer & Kertas UGM Settings Card (Item 9) */}
+        <Card className="space-y-4 bg-white border border-slate-200 shadow-sm md:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-800">Setting Printer & Format Kertas UGM (Unit Gadai Mandiri)</h3>
+              <p className="text-[11px] text-slate-500">Pilihan format kertas kasir (NCR 2-Rangkap, Thermal 80mm/58mm, A5) dan panduan printer rekomendasi</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPrinterModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm cursor-pointer transition-colors"
+            >
+              <span>⚙️ Buka Pengaturan Printer Nota</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-[10px] text-slate-500 block uppercase font-bold">Rekomendasi Utama:</span>
+              <strong className="text-slate-900 text-xs block mt-0.5">Epson LX-310 Dot Matrix</strong>
+              <span className="text-[10px] text-emerald-700 font-medium">Kertas NCR 2-Rangkap (UGM & Nasabah)</span>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-[10px] text-slate-500 block uppercase font-bold">Standar Kasir Cepat:</span>
+              <strong className="text-slate-900 text-xs block mt-0.5">Epson TM-T82X (Thermal 80mm)</strong>
+              <span className="text-[10px] text-slate-600">Auto-cutter 200mm/s</span>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-[10px] text-slate-500 block uppercase font-bold">Pilihan Ekonomis:</span>
+              <strong className="text-slate-900 text-xs block mt-0.5">Panda POS-80 / Iware 80mm</strong>
+              <span className="text-[10px] text-slate-600">Dual USB + Bluetooth</span>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span className="text-[10px] text-slate-500 block uppercase font-bold">Mobile / Lapangan:</span>
+              <strong className="text-slate-900 text-xs block mt-0.5">Mini Bluetooth POS 58mm</strong>
+              <span className="text-[10px] text-slate-600">Baterai portabel praktis</span>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="flex justify-end pt-2">
-        <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold flex items-center space-x-2 cursor-pointer shadow-sm transition-colors">
+        <button
+          type="button"
+          onClick={() => setIsPrinterModalOpen(true)}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold flex items-center space-x-2 cursor-pointer shadow-sm transition-colors"
+        >
           <Save className="w-4 h-4" />
-          <span>Simpan Tarif Syariah</span>
+          <span>Simpan Konfigurasi Operasional</span>
         </button>
       </div>
+
+      <PrinterSettingsModal
+        isOpen={isPrinterModalOpen}
+        onClose={() => setIsPrinterModalOpen(false)}
+      />
     </div>
   );
 };

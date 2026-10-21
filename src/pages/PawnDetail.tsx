@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, FileCheck2, KeyRound, Package, Printer, RefreshCw, ScanLine, ShieldCheck, UserCheck } from 'lucide-react';
+import { ArrowLeft, CheckCircle, FileCheck2, KeyRound, Package, Printer, RefreshCw, ScanLine, ShieldCheck, UserCheck, MessageCircle, Car } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
 import { QRCodeView } from '../components/common/QRCodeView';
+import { UGMReceiptModal } from '../components/common/UGMReceiptModal';
 import { pawnApi } from '../services/endpoints';
 import { PawnTransaction, PaymentCalculation } from '../types';
 import { useAlert } from '../context/AlertContext';
@@ -20,6 +21,7 @@ export const PawnDetail: React.FC = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReleaseOpen, setIsReleaseOpen] = useState(false);
   const [isPinkPrintOpen, setIsPinkPrintOpen] = useState(false);
+  const [isUGMReceiptOpen, setIsUGMReceiptOpen] = useState(false);
   const [paymentType, setPaymentType] = useState<'INTEREST_PAYMENT' | 'EXTENSION_PAYMENT' | 'FULL_PAYOFF'>('EXTENSION_PAYMENT');
   const [paymentMethod, setPaymentMethod] = useState('CASH');
 
@@ -150,13 +152,34 @@ export const PawnDetail: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => setIsPinkPrintOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white text-xs font-bold flex items-center space-x-2 shadow-sm transition-all cursor-pointer border border-pink-400"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Cetak Kertas Pink (SBG Fisik)</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsUGMReceiptOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer"
+          >
+            <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
+            <span>Kirim Nota ke WA</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsUGMReceiptOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer"
+          >
+            <Printer className="w-4 h-4 text-emerald-400" />
+            <span>Cetak Nota Fisik 2 Lembar UGM</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsPinkPrintOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer border border-pink-400"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Kertas Pink</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -230,6 +253,17 @@ export const PawnDetail: React.FC = () => {
 
               {/* Asset Technical & Physical Details Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                {pawn.appraisal.asset.license_plate && (
+                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-700 text-white col-span-2 sm:col-span-1 shadow-sm">
+                    <span className="text-amber-400 block text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Car className="w-3.5 h-3.5" />
+                      <span>Nomor Plat Kendaraan:</span>
+                    </span>
+                    <span className="font-mono font-black text-sm text-white tracking-widest mt-0.5 block">
+                      {pawn.appraisal.asset.license_plate}
+                    </span>
+                  </div>
+                )}
                 <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200">
                   <span className="text-slate-500 block text-[11px]">No. Seri / IMEI:</span>
                   <span className="font-mono font-semibold text-slate-800 break-all">
@@ -742,6 +776,13 @@ export const PawnDetail: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Modal Cetak Nota Fisik 2 Lembar UGM & WhatsApp */}
+      <UGMReceiptModal
+        isOpen={isUGMReceiptOpen}
+        onClose={() => setIsUGMReceiptOpen(false)}
+        pawn={pawn}
+      />
     </div>
   );
 };

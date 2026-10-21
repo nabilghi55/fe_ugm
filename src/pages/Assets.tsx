@@ -22,6 +22,9 @@ export const Assets: React.FC = () => {
   const [variant, setVariant] = useState('256GB');
   const [serialNumber, setSerialNumber] = useState('');
   const [imei, setImei] = useState('');
+  const [licensePlate, setLicensePlate] = useState('');
+  const [chassisNumber, setChassisNumber] = useState('');
+  const [engineNumber, setEngineNumber] = useState('');
   const [year, setYear] = useState(2024);
   const [physicalCondition, setPhysicalCondition] = useState('GOOD');
   const [functionalCondition, setFunctionalCondition] = useState('GOOD');
@@ -68,6 +71,12 @@ export const Assets: React.FC = () => {
     const cat = categories.find((c) => c.id === catId);
     if (cat) {
       setupChecklistForCategory(cat);
+      const isVeh = cat.name.toLowerCase().includes('motor') || cat.name.toLowerCase().includes('mobil') || cat.name.toLowerCase().includes('kendaraan');
+      if (!isVeh) {
+        setLicensePlate('');
+        setChassisNumber('');
+        setEngineNumber('');
+      }
     }
   };
 
@@ -88,13 +97,19 @@ export const Assets: React.FC = () => {
         });
       }
 
+      const selectedCat = categories.find((c) => c.id === categoryId);
+      const isVeh = (selectedCat?.name || '').toLowerCase().includes('motor') || (selectedCat?.name || '').toLowerCase().includes('mobil') || (selectedCat?.name || '').toLowerCase().includes('kendaraan');
+
       await assetApi.create({
         category_id: categoryId,
         brand,
         model,
         variant,
-        serial_number: serialNumber,
-        imei,
+        serial_number: isVeh ? undefined : serialNumber,
+        imei: isVeh ? undefined : imei,
+        license_plate: isVeh ? licensePlate.toUpperCase().trim() : undefined,
+        chassis_number: isVeh ? chassisNumber.trim() : undefined,
+        engine_number: isVeh ? engineNumber.trim() : undefined,
         year: Number(year),
         physical_condition: physicalCondition,
         functional_condition: functionalCondition,
@@ -111,6 +126,11 @@ export const Assets: React.FC = () => {
       setSubmitting(false);
     }
   };
+
+  const selectedCat = categories.find((c) => c.id === categoryId);
+  const catName = (selectedCat?.name || '').toLowerCase();
+  const isVehicle = catName.includes('motor') || catName.includes('mobil') || catName.includes('kendaraan');
+  const isGold = catName.includes('emas') || catName.includes('gold') || catName.includes('perhiasan');
 
   return (
     <div className="space-y-6 animate-fade-in font-sans">
@@ -149,6 +169,11 @@ export const Assets: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">{asset.category?.name || 'Elektronik'}</span>
               <h3 className="text-base font-bold text-slate-800">{asset.brand} {asset.model}</h3>
               <p className="text-xs text-slate-500">{asset.variant || ''} {asset.color ? `• ${asset.color}` : ''}</p>
+              {asset.license_plate && (
+                <div className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 text-white font-mono font-bold text-[10px] tracking-wider">
+                  <span>{asset.license_plate}</span>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
@@ -203,35 +228,89 @@ export const Assets: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Varian / Kapasitas Storage</label>
+              <label className="text-xs font-semibold text-slate-700">
+                {isGold ? 'Kadar Karat / Berat (Gram)' : isVehicle ? 'Kapasitas Mesin (CC) / Tipe' : 'Varian / Kapasitas Storage'}
+              </label>
               <input
                 type="text"
                 value={variant}
                 onChange={(e) => setVariant(e.target.value)}
-                placeholder="256GB / 8GB RAM"
+                placeholder={isGold ? 'Contoh: 24 Karat / 10 Gram' : isVehicle ? 'Contoh: 150cc / CBS' : '256GB / 8GB RAM'}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Serial Number / IMEI</label>
-              <input
-                type="text"
-                value={imei || serialNumber}
-                onChange={(e) => setImei(e.target.value)}
-                placeholder="354812345678901"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Tahun Pembelian</label>
-              <input
-                type="number"
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
+            {!isVehicle ? (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  {isGold ? 'Nomor Seri Sertifikat' : 'Serial Number / IMEI'}
+                </label>
+                <input
+                  type="text"
+                  value={imei || serialNumber}
+                  onChange={(e) => setImei(e.target.value)}
+                  placeholder={isGold ? 'Sertifikat Antam / UBS' : '354812345678901'}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Tahun Pembuatan (STNK)</label>
+                <input
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            )}
+            {!isVehicle && (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Tahun Pembelian</label>
+                <input
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            )}
           </div>
+
+          {/* Input Spesifik Kendaraan (Hanya muncul jika kategori Kendaraan / Motor / Mobil) */}
+          {isVehicle && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200 animate-in fade-in">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-amber-900">Nomor Plat Polisi (Kendaraan)</label>
+                <input
+                  type="text"
+                  value={licensePlate}
+                  onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
+                  placeholder="Contoh: BA 1234 XY"
+                  className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Nomor Rangka</label>
+                <input
+                  type="text"
+                  value={chassisNumber}
+                  onChange={(e) => setChassisNumber(e.target.value.toUpperCase())}
+                  placeholder="MH1KF..."
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Nomor Mesin</label>
+                <input
+                  type="text"
+                  value={engineNumber}
+                  onChange={(e) => setEngineNumber(e.target.value.toUpperCase())}
+                  placeholder="KF11E..."
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Dynamic Inspection Checklist */}
           <DynamicChecklist
